@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,8 +14,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyan.shade800),
+        useMaterial3: false,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -51,51 +52,90 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  bool _isVisible = true;
+
+  void toggleVisibility() {
+    setState(() {
+      _isVisible = !_isVisible;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("Appbar Demo"),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text("Login"),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.notifications),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.settings),
-          ),
-        ],
-        leading: IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.menu),
-        ),
       ),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            // Padding(
-            //   padding: const EdgeInsets.only(top: 20.0),
-            //   child: SizedBox(
-            //     height: 300,
-            //     width: 300,
-            //     child: Image.network(
-            //         "https://images.unsplash.com/photo-1493612276216-ee3925520721?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tfGVufDB8fDB8fHww"),
-            //   ),
-            // ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: SizedBox(
-                height: 200,
-                width: 300,
-                child: Image.asset(
-                  "assets/leaf.jpg",
+      body: Padding(
+        padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 70.0),
+                child: SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: Lottie.network(
+                      'https://raw.githubusercontent.com/xvrh/lottie-flutter/master/example/assets/Mobilo/A.json'),
                 ),
               ),
-            )
-          ],
+              const Padding(
+                padding: EdgeInsets.only(top: 20.0),
+                child: TextField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Username',
+                    hintText: "Enter your username",
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 20.0),
+                child: TextField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Password',
+                    hintText: "Enter your password",
+                    suffixIcon: IconButton(
+                      onPressed: toggleVisibility,
+                      icon: Icon(
+                          _isVisible ? Icons.visibility : Icons.visibility_off),
+                    ),
+                  ),
+                  obscureText: !_isVisible,
+                ),
+              ),
+              Padding(
+                  padding: EdgeInsets.only(top: 50.0),
+                  child: Column(
+                    children: [
+                      Text("New User? Create Account"),
+                      TextButton(
+                        onPressed: () {},
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 10.0),
+                          child: Text(
+                            "Forgot Password?",
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: null,
+        label: Text("Login"),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
         ),
       ),
     );
