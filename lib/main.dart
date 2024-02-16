@@ -36,7 +36,7 @@ class MyHomePage extends StatefulWidget {
 
   String display = "0";
   double balance = 0.0;
-  String oldOperation = "+";
+  String oldOperation = "";
   String? newOperation = "+";
   // double? nextOperand;
 
@@ -49,15 +49,15 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       widget.display = "0";
       widget.balance = 0.0;
-      widget.oldOperation = "+";
+      widget.oldOperation = "";
       widget.newOperation = "+";
     });
     printStates();
   }
 
   void printStates() {
-    print("display: ${widget.display}");
     print("balance: ${widget.balance}");
+    print("display: ${widget.display}");
     print("oldOperation: ${widget.oldOperation}");
     print("newOperation: ${widget.newOperation}");
   }
@@ -81,6 +81,33 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void handleOperationPressed(String operation) {
+    if (operation == "=") {
+      if (widget.oldOperation.startsWith("=")) {
+        String oper = widget.oldOperation.substring(1, 2);
+        double value = double.parse(widget.oldOperation.substring(2));
+        widget.balance = calculate(widget.balance, oper, value);
+        widget.newOperation = "=";
+
+        setState(() {
+          widget.display = doubleToString(widget.balance);
+        });
+        printStates();
+        return;
+      } else {
+        double displayValue = double.parse(widget.display);
+        widget.balance =
+            calculate(widget.balance, widget.oldOperation, displayValue);
+        widget.oldOperation = "=${widget.oldOperation}$displayValue";
+        widget.newOperation = "=";
+
+        setState(() {
+          widget.display = doubleToString(widget.balance);
+        });
+        printStates();
+        return;
+      }
+    }
+
     // widget.newOperation = operation;
     if (widget.newOperation == null) {
       widget.balance = calculate(
@@ -89,8 +116,8 @@ class _MyHomePageState extends State<MyHomePage> {
         widget.display = doubleToString(widget.balance);
       });
     }
-    widget.newOperation = operation;
 
+    widget.newOperation = operation;
     printStates();
   }
 
@@ -168,12 +195,30 @@ class _MyHomePageState extends State<MyHomePage> {
         return op1 / op2;
       case "":
         return op2;
+      case "=":
+        return op2;
       default:
+        // if ()
         return 0.0;
     }
   }
 
   void backspace() {
+    if (widget.newOperation != null) {
+      return;
+    }
+
+    if (widget.display.length == 1) {
+      setState(() {
+        widget.display = "0";
+      });
+      return;
+    } else if (widget.display.length == 2 && widget.display[0] == "-") {
+      setState(() {
+        widget.display = "0";
+      });
+      return;
+    }
     setState(() {
       widget.display = widget.display.substring(0, widget.display.length - 1);
     });
@@ -345,7 +390,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           }),
                       OpButton(
                         label: "=",
-                        onPressed: () {},
+                        onPressed: () {
+                          handleOperationPressed("=");
+                        },
                       )
                     ],
                   ),
