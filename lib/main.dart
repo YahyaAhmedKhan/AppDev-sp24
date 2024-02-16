@@ -1,5 +1,8 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+
+import 'buttons.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,16 +17,26 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyan.shade800),
-        useMaterial3: false,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+          useMaterial3: false,
+          textTheme: const TextTheme(
+              bodyLarge: TextStyle(color: Colors.white),
+              bodyMedium: TextStyle(color: Colors.white),
+              bodySmall: TextStyle(color: Colors.white)),
+          scaffoldBackgroundColor: Colors.black),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title});
+
+  String display = "0";
+
+  double? op1 = 0;
+  double? op2 = 0;
+  String? operation = "+";
 
   final String title;
 
@@ -32,111 +45,254 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
+  void clear() {
     setState(() {
-      _counter++;
+      widget.display = "0";
+      widget.op1 = null;
+      widget.op2 = null;
+      widget.operation = null;
     });
   }
 
-  void _decrementCounter() {
-    setState(() {
-      if (_counter > 0) _counter--;
-    });
+//null? op1 type : (no op ? op1 type: op2 type)
+  void numberPressed(int number) {
+    if (widget.display.length < 16) {
+      if (widget.operation == null) {
+        widget.op2 = widget.op2! * 10 + number;
+        setState(() {
+          widget.display = widget.op2.toString();
+        });
+      } else {
+        // updateResult(widget.op1, widget.op2, widget.operation!);
+        setState(() {
+          widget.display = number.toString();
+          widget.operation = "+";
+        });
+      }
+    }
   }
 
-  void _resetCounter() {
-    setState(() {
-      _counter = 0;
-    });
+  void updateResult(double op1, double op2, String op) {
+    switch (op) {
+      case "+":
+        op1 = op1 + op2;
+        break;
+      case "-":
+        op1 = op1 - op2;
+        break;
+      case "x":
+        op1 = op1 * op2;
+        break;
+      case "/":
+        op1 = op1 / op2;
+        break;
+    }
   }
 
-  bool _isVisible = true;
+  handleOperationPress(String op) {
+    if (widget.operation == null) {
+      widget.op2 = null;
+      widget.op1 = double.parse(widget.display);
+    }
+    // else if ()
+  }
 
-  void toggleVisibility() {
-    setState(() {
-      _isVisible = !_isVisible;
-    });
+// if temp null, set temp
+// if temp not null and op null, update temp
+
+  void handleNumberPress(int number) {
+    if (widget.display.length < 16) {
+      if (widget.operation == null) {
+        setState(() {
+          widget.display += number.toString();
+        });
+      } else {
+        setState(() {
+          widget.display = number.toString();
+          widget.operation = "+";
+        });
+      }
+    }
+  }
+
+// if temp null, do nothing
+// if temp not null and op null,c
+  void handleOpertationPress(String op) {}
+
+  void backspace() {
+    // if (widget.display.length == 1) {
+    //   setState(() {
+    //     widget.display = "0";
+    //   });
+    // }
+    if (widget.display.length > 0) {
+      setState(() {
+        widget.display = widget.display.substring(0, widget.display.length - 1);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text("Login"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: 70.0),
-                child: SizedBox(
-                  height: 100,
-                  width: 100,
-                  child: Lottie.network(
-                      'https://raw.githubusercontent.com/xvrh/lottie-flutter/master/example/assets/Mobilo/A.json'),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Username',
-                    hintText: "Enter your username",
+      body: Column(
+        children: [
+          GestureDetector(
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity! > 0) {
+                backspace();
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(top: 100),
+              child: SizedBox(
+                height: 100,
+                width: double.infinity,
+                child: AutoSizeText(
+                  widget.display,
+                  // style: Theme.of(context).textTheme.bodyLarge,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 50,
                   ),
+                  maxLines: 1,
+                  stepGranularity: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
-                    hintText: "Enter your password",
-                    suffixIcon: IconButton(
-                      onPressed: toggleVisibility,
-                      icon: Icon(
-                          _isVisible ? Icons.visibility : Icons.visibility_off),
-                    ),
-                  ),
-                  obscureText: !_isVisible,
-                ),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(top: 50.0),
-                  child: Column(
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text("New User? Create Account"),
-                      TextButton(
+                      ExtraButton(
+                          label: "AC",
+                          onPressed: () {
+                            clear();
+                          }),
+                      ExtraButton(label: "±", onPressed: () {}),
+                      ExtraButton(label: "%", onPressed: () {}),
+                      OpButton(
+                          label: "/",
+                          onPressed: () {
+                            handleOperationPress("/");
+                          })
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      NumberButton(
+                          label: "7",
+                          onPressed: () {
+                            numberPressed(7);
+                          }),
+                      NumberButton(
+                          label: "8",
+                          onPressed: () {
+                            numberPressed(8);
+                          }),
+                      NumberButton(
+                          label: "9",
+                          onPressed: () {
+                            numberPressed(9);
+                          }),
+                      OpButton(
+                          label: "x",
+                          onPressed: () {
+                            handleOperationPress("x");
+                          })
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      NumberButton(
+                          label: "4",
+                          onPressed: () {
+                            numberPressed(4);
+                          }),
+                      NumberButton(
+                          label: "5",
+                          onPressed: () {
+                            numberPressed(5);
+                          }),
+                      NumberButton(
+                          label: "6",
+                          onPressed: () {
+                            numberPressed(6);
+                          }),
+                      OpButton(
+                          label: "-",
+                          onPressed: () {
+                            handleOperationPress("-");
+                          })
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      NumberButton(
+                          label: "1",
+                          onPressed: () {
+                            numberPressed(1);
+                          }),
+                      NumberButton(
+                          label: "2",
+                          onPressed: () {
+                            numberPressed(2);
+                          }),
+                      NumberButton(
+                          label: "3",
+                          onPressed: () {
+                            numberPressed(3);
+                          }),
+                      OpButton(
+                          label: "+",
+                          onPressed: () {
+                            handleOperationPress("+");
+                          })
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      NumberButton(
+                        label: "0",
                         onPressed: () {},
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 10.0),
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              color: Colors.blue,
-                            ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey.shade800,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(70),
+                          ),
+                          padding: EdgeInsets.all(20),
+                          fixedSize: Size(
+                              MediaQuery.sizeOf(context).width * 2.4 * 0.7 / 4,
+                              MediaQuery.sizeOf(context).width * 0.7 / 4),
+                          textStyle: const TextStyle(
+                            fontSize: 35,
                           ),
                         ),
                       ),
+                      NumberButton(label: ".", onPressed: () {}),
+                      OpButton(
+                        label: "=",
+                        onPressed: () {},
+                      )
                     ],
-                  )),
-            ],
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: null,
-        label: Text("Login"),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
+        ],
       ),
     );
   }
