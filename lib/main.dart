@@ -1,6 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
+// import 'package:lottie/lottie.dart';
 
 import 'buttons.dart';
 
@@ -32,13 +32,13 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({super.key, required this.title});
 
-  String display = "0";
-
-  double? op1 = 0;
-  double? op2 = 0;
-  String? operation = "+";
-
   final String title;
+
+  String display = "0";
+  double balance = 0.0;
+  String oldOperation = "+";
+  String? newOperation = "+";
+  // double? nextOperand;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -48,88 +48,135 @@ class _MyHomePageState extends State<MyHomePage> {
   void clear() {
     setState(() {
       widget.display = "0";
-      widget.op1 = null;
-      widget.op2 = null;
-      widget.operation = null;
+      widget.balance = 0.0;
+      widget.oldOperation = "+";
+      widget.newOperation = "+";
+    });
+    printStates();
+  }
+
+  void printStates() {
+    print("display: ${widget.display}");
+    print("balance: ${widget.balance}");
+    print("oldOperation: ${widget.oldOperation}");
+    print("newOperation: ${widget.newOperation}");
+  }
+
+  String doubleToString(double value) {
+    if (value == value.toInt()) {
+      return value.toInt().toString();
+    } else {
+      return value.toString();
+    }
+  }
+
+  void handleNumberPressed(int number) {
+    if (widget.newOperation != null) {
+      typeNextOperand(number);
+    } else {
+      print("append");
+      appendNumber(number);
+    }
+    printStates();
+  }
+
+  void handleOperationPressed(String operation) {
+    // widget.newOperation = operation;
+    if (widget.newOperation == null) {
+      widget.balance = calculate(
+          widget.balance, widget.oldOperation, double.parse(widget.display));
+      setState(() {
+        widget.display = doubleToString(widget.balance);
+      });
+    }
+    widget.newOperation = operation;
+
+    printStates();
+  }
+
+  switchSign(String display) {
+    if (display == "0") {
+      return display;
+    } else if (display[0] == "-") {
+      return display.substring(1);
+    } else {
+      return "-$display";
+    }
+  }
+
+  void handleSpecialPressed(String special) {
+    switch (special) {
+      case "AC":
+        clear();
+        break;
+      case "±":
+        setState(() {
+          widget.display = switchSign(widget.display);
+        });
+        break;
+      case "%":
+        setState(() {
+          widget.display = doubleToString(double.parse(widget.display) / 100);
+        });
+        break;
+      case ".":
+        if (widget.newOperation != null) {
+          setState(() {
+            widget.display = "0.";
+            widget.newOperation = null;
+          });
+        } else if (!widget.display.contains(".")) {
+          setState(() {
+            widget.display += ".";
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  void appendNumber(int number) {
+    setState(() {
+      if (widget.display == "0") {
+        widget.display = number.toString();
+      } else {
+        widget.display += number.toString();
+      }
     });
   }
 
-//null? op1 type : (no op ? op1 type: op2 type)
-  void numberPressed(int number) {
-    if (widget.display.length < 16) {
-      if (widget.operation == null) {
-        widget.op2 = widget.op2! * 10 + number;
-        setState(() {
-          widget.display = widget.op2.toString();
-        });
-      } else {
-        // updateResult(widget.op1, widget.op2, widget.operation!);
-        setState(() {
-          widget.display = number.toString();
-          widget.operation = "+";
-        });
-      }
-    }
+  void typeNextOperand(int number) {
+    setState(() {
+      // widget.balance = calculate(
+      //     widget.balance, widget.oldOperation, double.parse(widget.display));
+      widget.oldOperation = widget.newOperation!;
+      widget.newOperation = null;
+      widget.display = number.toString();
+    });
   }
 
-  void updateResult(double op1, double op2, String op) {
+  double calculate(double op1, String op, double op2) {
     switch (op) {
       case "+":
-        op1 = op1 + op2;
-        break;
+        return op1 + op2;
       case "-":
-        op1 = op1 - op2;
-        break;
+        return op1 - op2;
       case "x":
-        op1 = op1 * op2;
-        break;
+        return op1 * op2;
       case "/":
-        op1 = op1 / op2;
-        break;
+        return op1 / op2;
+      case "":
+        return op2;
+      default:
+        return 0.0;
     }
   }
-
-  handleOperationPress(String op) {
-    if (widget.operation == null) {
-      widget.op2 = null;
-      widget.op1 = double.parse(widget.display);
-    }
-    // else if ()
-  }
-
-// if temp null, set temp
-// if temp not null and op null, update temp
-
-  void handleNumberPress(int number) {
-    if (widget.display.length < 16) {
-      if (widget.operation == null) {
-        setState(() {
-          widget.display += number.toString();
-        });
-      } else {
-        setState(() {
-          widget.display = number.toString();
-          widget.operation = "+";
-        });
-      }
-    }
-  }
-
-// if temp null, do nothing
-// if temp not null and op null,c
-  void handleOpertationPress(String op) {}
 
   void backspace() {
-    // if (widget.display.length == 1) {
-    //   setState(() {
-    //     widget.display = "0";
-    //   });
-    // }
-    if (widget.display.length > 0) {
-      setState(() {
-        widget.display = widget.display.substring(0, widget.display.length - 1);
-      });
-    }
+    setState(() {
+      widget.display = widget.display.substring(0, widget.display.length - 1);
+    });
   }
 
   @override
@@ -177,12 +224,20 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () {
                             clear();
                           }),
-                      ExtraButton(label: "±", onPressed: () {}),
-                      ExtraButton(label: "%", onPressed: () {}),
+                      ExtraButton(
+                          label: "±",
+                          onPressed: () {
+                            handleSpecialPressed("±");
+                          }),
+                      ExtraButton(
+                          label: "%",
+                          onPressed: () {
+                            handleSpecialPressed("%");
+                          }),
                       OpButton(
                           label: "/",
                           onPressed: () {
-                            handleOperationPress("/");
+                            handleOperationPressed("/");
                           })
                     ],
                   ),
@@ -192,22 +247,22 @@ class _MyHomePageState extends State<MyHomePage> {
                       NumberButton(
                           label: "7",
                           onPressed: () {
-                            numberPressed(7);
+                            handleNumberPressed(7);
                           }),
                       NumberButton(
                           label: "8",
                           onPressed: () {
-                            numberPressed(8);
+                            handleNumberPressed(8);
                           }),
                       NumberButton(
                           label: "9",
                           onPressed: () {
-                            numberPressed(9);
+                            handleNumberPressed(9);
                           }),
                       OpButton(
                           label: "x",
                           onPressed: () {
-                            handleOperationPress("x");
+                            handleOperationPressed("x");
                           })
                     ],
                   ),
@@ -217,22 +272,22 @@ class _MyHomePageState extends State<MyHomePage> {
                       NumberButton(
                           label: "4",
                           onPressed: () {
-                            numberPressed(4);
+                            handleNumberPressed(4);
                           }),
                       NumberButton(
                           label: "5",
                           onPressed: () {
-                            numberPressed(5);
+                            handleNumberPressed(5);
                           }),
                       NumberButton(
                           label: "6",
                           onPressed: () {
-                            numberPressed(6);
+                            handleNumberPressed(6);
                           }),
                       OpButton(
                           label: "-",
                           onPressed: () {
-                            handleOperationPress("-");
+                            handleOperationPressed("-");
                           })
                     ],
                   ),
@@ -242,22 +297,22 @@ class _MyHomePageState extends State<MyHomePage> {
                       NumberButton(
                           label: "1",
                           onPressed: () {
-                            numberPressed(1);
+                            handleNumberPressed(1);
                           }),
                       NumberButton(
                           label: "2",
                           onPressed: () {
-                            numberPressed(2);
+                            handleNumberPressed(2);
                           }),
                       NumberButton(
                           label: "3",
                           onPressed: () {
-                            numberPressed(3);
+                            handleNumberPressed(3);
                           }),
                       OpButton(
                           label: "+",
                           onPressed: () {
-                            handleOperationPress("+");
+                            handleOperationPressed("+");
                           })
                     ],
                   ),
@@ -266,7 +321,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       NumberButton(
                         label: "0",
-                        onPressed: () {},
+                        onPressed: () {
+                          handleNumberPressed(0);
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey.shade800,
                           shape: RoundedRectangleBorder(
@@ -281,7 +338,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-                      NumberButton(label: ".", onPressed: () {}),
+                      NumberButton(
+                          label: ".",
+                          onPressed: () {
+                            handleSpecialPressed(".");
+                          }),
                       OpButton(
                         label: "=",
                         onPressed: () {},
