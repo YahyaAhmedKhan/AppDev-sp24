@@ -37,6 +37,8 @@ class NumberButton extends GeneralButton {
             shape: CircleBorder(),
             padding: EdgeInsets.all(20),
             textStyle: const TextStyle(
+              fontFamily: "SFNSDisplay",
+              fontWeight: FontWeight.w400,
               color: Colors.white,
               fontSize: 35,
             ),
@@ -72,10 +74,15 @@ class ExtraButton extends GeneralButton {
             // ),
             fixedSize: Size(size, size),
           ),
-      child: Text(
-        label,
-        style: const TextStyle(
-            color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 28),
+      child: SizedBox(
+        child: Text(
+          label,
+          style: const TextStyle(
+              fontFamily: "SFNSDisplay",
+              color: Colors.black54,
+              fontWeight: FontWeight.bold,
+              fontSize: 24),
+        ),
       ),
     );
   }
@@ -100,6 +107,8 @@ class OpButton extends GeneralButton {
             shape: CircleBorder(),
             padding: EdgeInsets.all(20),
             textStyle: const TextStyle(
+              fontFamily: "Helvetica",
+              fontWeight: FontWeight.w400,
               color: Colors.white,
               fontSize: 30,
             ),

@@ -19,10 +19,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
           useMaterial3: false,
+          fontFamily: 'Helvetica',
           textTheme: const TextTheme(
-              bodyLarge: TextStyle(color: Colors.white),
-              bodyMedium: TextStyle(color: Colors.white),
-              bodySmall: TextStyle(color: Colors.white)),
+            bodyLarge: TextStyle(color: Colors.white),
+            bodyMedium: TextStyle(color: Colors.white),
+            bodySmall: TextStyle(color: Colors.white),
+          ),
           scaffoldBackgroundColor: Colors.black),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -280,7 +282,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             handleSpecialPressed("%");
                           }),
                       OpButton(
-                          label: "/",
+                          label: "÷",
                           onPressed: () {
                             handleOperationPressed("/");
                           })
@@ -305,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             handleNumberPressed(9);
                           }),
                       OpButton(
-                          label: "x",
+                          label: "×",
                           onPressed: () {
                             handleOperationPressed("x");
                           })
@@ -379,6 +381,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               MediaQuery.sizeOf(context).width * 2.4 * 0.7 / 4,
                               MediaQuery.sizeOf(context).width * 0.7 / 4),
                           textStyle: const TextStyle(
+                            fontFamily: "Helvetica",
                             fontSize: 35,
                           ),
                         ),

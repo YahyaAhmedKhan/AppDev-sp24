@@ -74,7 +74,33 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
+
+  fonts:
+    - family: SFNSDisplay
+      fonts:
+        - asset: assets/fonts/SFNSDisplay-Black.otf
+          weight: 900
+        - asset: assets/fonts/SFNSDisplay-Bold.otf
+          weight: 700
+        - asset: assets/fonts/SFNSDisplay-Heavy.otf
+          weight: 800
+        - asset: assets/fonts/SFNSDisplay-Light.otf
+          weight: 300
+        - asset: assets/fonts/SFNSDisplay-Medium.otf
+          weight: 500
+        - asset: assets/fonts/SFNSDisplay-Regular.otf
+          weight: 400
+        - asset: assets/fonts/SFNSDisplay-Semibold.otf
+          weight: 600
+        - asset: assets/fonts/SFNSDisplay-Thin.otf
+          weight: 100
+        - asset: assets/fonts/SFNSDisplay-Ultralight.otf
+          weight: 200
+    # - family: Helvetica
+    #   fonts:
+    #     - asset: assets/fonts/Helvetica-Normal.ttf
+    #       weight: 400
+
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
