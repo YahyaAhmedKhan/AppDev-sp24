@@ -65,6 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String doubleToString(double value) {
+    if (value.isInfinite || value.isNaN) return "NaN";
+
     if (value == value.toInt()) {
       return value.toInt().toString();
     } else {
@@ -79,6 +81,16 @@ class _MyHomePageState extends State<MyHomePage> {
       print("append");
       appendNumber(number);
     }
+    printStates();
+  }
+
+  void handleNan() {
+    setState(() {
+      widget.display = "NaN";
+      widget.balance = 0.0;
+      widget.oldOperation = "";
+      widget.newOperation = "+";
+    });
     printStates();
   }
 
@@ -147,6 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           widget.display = doubleToString(double.parse(widget.display) / 100);
         });
+        widget.newOperation = "";
         break;
       case ".":
         if (widget.newOperation != null) {
@@ -242,17 +255,25 @@ class _MyHomePageState extends State<MyHomePage> {
               child: SizedBox(
                 height: 100,
                 width: double.infinity,
-                child: AutoSizeText(
-                  widget.display,
-                  // style: Theme.of(context).textTheme.bodyLarge,
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 50,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: AutoSizeText(
+                      widget.display,
+                      // style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(
+                        fontFamily: "SFNSDisplay",
+                        fontWeight: FontWeight.w300,
+                        color: Colors.white,
+                        fontSize: 90,
+                      ),
+                      maxLines: 1,
+                      stepGranularity: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  maxLines: 1,
-                  stepGranularity: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
@@ -272,7 +293,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             clear();
                           }),
                       ExtraButton(
-                          label: "±",
+                          label: "+/-",
                           onPressed: () {
                             handleSpecialPressed("±");
                           }),
@@ -367,6 +388,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       NumberButton(
+                        alignment: Alignment.centerLeft,
                         label: "0",
                         onPressed: () {
                           handleNumberPressed(0);
@@ -379,18 +401,16 @@ class _MyHomePageState extends State<MyHomePage> {
                           padding: EdgeInsets.all(20),
                           fixedSize: Size(
                               MediaQuery.sizeOf(context).width * 2.4 * 0.7 / 4,
-                              MediaQuery.sizeOf(context).width * 0.7 / 4),
+                              MediaQuery.sizeOf(context).width * 0.75 / 4),
                           textStyle: const TextStyle(
-                            fontFamily: "Helvetica",
-                            fontSize: 35,
+                            fontFamily: "SFNSDisplay",
+                            fontSize: 39,
                           ),
                         ),
                       ),
                       NumberButton(
                           label: ".",
-                          onPressed: () {
-                            handleSpecialPressed(".");
-                          }),
+                          onPressed: () => handleSpecialPressed(".")),
                       OpButton(
                         label: "=",
                         onPressed: () {

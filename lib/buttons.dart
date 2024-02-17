@@ -4,11 +4,13 @@ abstract class GeneralButton extends StatelessWidget {
   final String label;
   final void Function() onPressed;
   final ButtonStyle? style;
+  final Alignment? alignment;
 
   const GeneralButton({
     required this.label,
     required this.onPressed,
     this.style,
+    this.alignment,
   }) : super();
 
   @override
@@ -23,7 +25,12 @@ class NumberButton extends GeneralButton {
     required String label,
     required void Function() onPressed,
     ButtonStyle? style,
-  }) : super(label: label, onPressed: onPressed, style: style);
+    Alignment? alignment,
+  }) : super(
+            label: label,
+            onPressed: onPressed,
+            style: style,
+            alignment: alignment);
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +41,31 @@ class NumberButton extends GeneralButton {
       style: style ??
           ElevatedButton.styleFrom(
             backgroundColor: Colors.grey.shade800,
-            shape: CircleBorder(),
-            padding: EdgeInsets.all(20),
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(20),
             textStyle: const TextStyle(
               fontFamily: "SFNSDisplay",
               fontWeight: FontWeight.w400,
               color: Colors.white,
-              fontSize: 35,
+              fontSize: 39,
             ),
             fixedSize: Size(size, size),
           ),
-      child: Text(label),
+      child: Align(
+        alignment: alignment ?? Alignment.topCenter,
+        child: Text(
+          style: const TextStyle(
+            height: 1.05,
+          ),
+          label,
+          textAlign: TextAlign.center,
+
+          // style: TextStyle(
+          //   height:
+          //       1, // Adjusts the line-height, potentially useful for centering
+          // ),
+        ),
+      ),
     );
   }
 }
@@ -66,22 +87,23 @@ class ExtraButton extends GeneralButton {
       style: style ??
           ElevatedButton.styleFrom(
             backgroundColor: Colors.grey.shade400,
-            shape: CircleBorder(),
-            padding: EdgeInsets.all(20),
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(20),
             // textStyle: const TextStyle(
             //   color: Colors.black,
             //   fontSize: 28,
             // ),
             fixedSize: Size(size, size),
           ),
-      child: SizedBox(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
         child: Text(
           label,
           style: const TextStyle(
               fontFamily: "SFNSDisplay",
               color: Colors.black54,
-              fontWeight: FontWeight.bold,
-              fontSize: 24),
+              fontWeight: FontWeight.w700,
+              fontSize: 29),
         ),
       ),
     );
@@ -104,13 +126,14 @@ class OpButton extends GeneralButton {
       style: style ??
           ElevatedButton.styleFrom(
             backgroundColor: Colors.orange.shade600,
-            shape: CircleBorder(),
-            padding: EdgeInsets.all(20),
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(20),
             textStyle: const TextStyle(
-              fontFamily: "Helvetica",
-              fontWeight: FontWeight.w400,
+              height: 0.89,
+              fontFamily: "SFNSDisplay",
+              fontWeight: FontWeight.w500,
               color: Colors.white,
-              fontSize: 30,
+              fontSize: 45,
             ),
             fixedSize: Size(size, size),
           ),
