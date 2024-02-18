@@ -40,9 +40,9 @@ class NumberButton extends GeneralButton {
       onPressed: onPressed,
       style: style ??
           ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey.shade800,
+            backgroundColor: Color(0xFF333333),
             shape: const CircleBorder(),
-            padding: const EdgeInsets.all(20),
+            // padding: const EdgeInsets.all(20),
             textStyle: const TextStyle(
               fontFamily: "SFNSDisplay",
               fontWeight: FontWeight.w400,
@@ -51,19 +51,16 @@ class NumberButton extends GeneralButton {
             ),
             fixedSize: Size(size, size),
           ),
-      child: Align(
-        alignment: alignment ?? Alignment.topCenter,
-        child: Text(
-          style: const TextStyle(
-            height: 1.05,
+      child: Center(
+        child: Align(
+          alignment: alignment ?? Alignment.center,
+          child: Text(
+            style: const TextStyle(
+                // height: 1.05,
+                ),
+            label,
+            textAlign: TextAlign.center,
           ),
-          label,
-          textAlign: TextAlign.center,
-
-          // style: TextStyle(
-          //   height:
-          //       1, // Adjusts the line-height, potentially useful for centering
-          // ),
         ),
       ),
     );
@@ -86,13 +83,8 @@ class ExtraButton extends GeneralButton {
       onPressed: onPressed,
       style: style ??
           ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey.shade400,
+            backgroundColor: Color(0xFFA5A5A5),
             shape: const CircleBorder(),
-            padding: const EdgeInsets.all(20),
-            // textStyle: const TextStyle(
-            //   color: Colors.black,
-            //   fontSize: 28,
-            // ),
             fixedSize: Size(size, size),
           ),
       child: FittedBox(
@@ -101,9 +93,9 @@ class ExtraButton extends GeneralButton {
           label,
           style: const TextStyle(
               fontFamily: "SFNSDisplay",
-              color: Colors.black54,
-              fontWeight: FontWeight.w700,
-              fontSize: 29),
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+              fontSize: 32),
         ),
       ),
     );
@@ -125,7 +117,7 @@ class OpButton extends GeneralButton {
       onPressed: onPressed,
       style: style ??
           ElevatedButton.styleFrom(
-            backgroundColor: Colors.orange.shade600,
+            backgroundColor: Color(0xFFFF9900),
             shape: const CircleBorder(),
             padding: const EdgeInsets.all(20),
             textStyle: const TextStyle(
