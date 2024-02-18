@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:test_app/buttons.dart';
 
 class Calculator extends StatefulWidget {
@@ -184,11 +183,11 @@ class _CalculatorState extends State<Calculator> {
                 handleNumberPressed(0);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF333333),
+                backgroundColor: const Color(0xFF333333),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(70),
                 ),
-                padding: EdgeInsets.only(left: 28),
+                padding: const EdgeInsets.only(left: 28),
                 fixedSize: Size(
                     MediaQuery.sizeOf(context).width * 2.4 * 0.7 / 4,
                     MediaQuery.sizeOf(context).width * 0.75 / 4),
@@ -383,8 +382,6 @@ class _CalculatorState extends State<Calculator> {
   }
 
   void backspace() {
-    print("backspace");
-
     if (widget.newOperation != null) {
       return;
     }

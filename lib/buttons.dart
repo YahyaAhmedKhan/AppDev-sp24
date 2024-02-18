@@ -7,21 +7,22 @@ abstract class GeneralButton extends StatelessWidget {
   final Alignment? alignment;
 
   const GeneralButton({
+    super.key,
     required this.label,
     required this.onPressed,
     this.style,
     this.alignment,
-  }) : super();
+  });
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     throw UnimplementedError();
   }
 }
 
 class NumberButton extends GeneralButton {
   const NumberButton({
+    super.key,
     required String label,
     required void Function() onPressed,
     ButtonStyle? style,
@@ -40,7 +41,7 @@ class NumberButton extends GeneralButton {
       onPressed: onPressed,
       style: style ??
           ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF333333),
+            backgroundColor: const Color(0xFF333333),
             shape: const CircleBorder(),
             // padding: const EdgeInsets.all(20),
             textStyle: const TextStyle(
@@ -69,6 +70,7 @@ class NumberButton extends GeneralButton {
 
 class ExtraButton extends GeneralButton {
   const ExtraButton({
+    super.key,
     required String label,
     required void Function() onPressed,
     ButtonStyle? style,
@@ -83,7 +85,7 @@ class ExtraButton extends GeneralButton {
       onPressed: onPressed,
       style: style ??
           ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFFA5A5A5),
+            backgroundColor: const Color(0xFFA5A5A5),
             shape: const CircleBorder(),
             fixedSize: Size(size, size),
           ),
@@ -104,6 +106,7 @@ class ExtraButton extends GeneralButton {
 
 class OpButton extends GeneralButton {
   const OpButton({
+    super.key,
     required String label,
     required void Function() onPressed,
     ButtonStyle? style,
@@ -117,7 +120,7 @@ class OpButton extends GeneralButton {
       onPressed: onPressed,
       style: style ??
           ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFFFF9900),
+            backgroundColor: const Color(0xFFFF9900),
             shape: const CircleBorder(),
             padding: const EdgeInsets.all(20),
             textStyle: const TextStyle(

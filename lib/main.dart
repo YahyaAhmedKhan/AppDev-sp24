@@ -1,9 +1,5 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:test_app/calculator.dart';
-// import 'package:lottie/lottie.dart';
-
-import 'buttons.dart';
 
 void main() {
   runApp(const MyApp());
