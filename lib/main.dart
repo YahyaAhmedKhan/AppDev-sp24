@@ -1,5 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
+import 'package:http/http.dart';
+import 'package:test_app/models/album_model.dart';
+
+import 'package:http/http.dart' as http;
+// import 'package:lottie/lottie.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyan.shade800),
-        useMaterial3: false,
+        useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -32,32 +39,52 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // Future<List<Album>> fetchAlbum() async {
+  //   final response = await http
+  //       .get(Uri.parse("https://jsonplaceholder.typicode.com/albums"));
+  //   if (response.statusCode == 200) {
+  //     final List<dynamic> data = json.decode(response.body);
+  //     return data.map((json) => Album.fromJson(json)).toList();
+  //   } else {
+  //     throw Exception("Failed to load album");
+  //   }
+  // }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  // Future<List<Album>> fetchAlbum() async {
+  //   late Future<List<Album>> futureAlbum;
+  //   Uri uriObject = Uri.parse('https://jsonplaceholder.typicode.com/albums');
+
+  //   final response = await get(uriObject);
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> data = jsonDecode(response.body);
+  //     // List<Album> itemsList = List<Album>.from(
+  //   }
+  // }
+
+  Future<List<Album>> fetchAlbums() async {
+    Uri uriObject = Uri.parse('https://jsonplaceholder.typicode.com/albums');
+    final response = await http.get(uriObject);
+
+    if (response.statusCode == 200) {
+      List<dynamic> parseListJson = jsonDecode(response.body);
+
+      //cant access by iterable through index
+      List<Album> items = List<Album>.from(
+        //map returns and interable
+        parseListJson.map<Album>((dynamic user) => Album.fromjson(user)),
+      );
+
+      //.from is more optimized than .tolist()
+
+      return items;
+    } else {
+      throw Exception('Failed to load album');
+    }
   }
 
-  void _decrementCounter() {
-    setState(() {
-      if (_counter > 0) _counter--;
-    });
-  }
-
-  void _resetCounter() {
-    setState(() {
-      _counter = 0;
-    });
-  }
-
-  bool _isVisible = true;
-
-  void toggleVisibility() {
-    setState(() {
-      _isVisible = !_isVisible;
-    });
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -65,75 +92,55 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text("Login"),
+        title: const Text("Login"),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: 70.0),
-                child: SizedBox(
-                  height: 100,
-                  width: 100,
-                  child: Lottie.network(
-                      'https://raw.githubusercontent.com/xvrh/lottie-flutter/master/example/assets/Mobilo/A.json'),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Username',
-                    hintText: "Enter your username",
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
-                    hintText: "Enter your password",
-                    suffixIcon: IconButton(
-                      onPressed: toggleVisibility,
-                      icon: Icon(
-                          _isVisible ? Icons.visibility : Icons.visibility_off),
-                    ),
-                  ),
-                  obscureText: !_isVisible,
-                ),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(top: 50.0),
-                  child: Column(
-                    children: [
-                      Text("New User? Create Account"),
-                      TextButton(
-                        onPressed: () {},
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 10.0),
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              color: Colors.blue,
+      body: SafeArea(
+        child: FutureBuilder(
+          future: fetchAlbums(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 3,
+                    child: ListTile(
+                      style: ListTileStyle.list,
+                      onTap: () {},
+                      title: Text(snapshot.data![index].title),
+                      trailing: IconButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) => Card(
+                              child: SizedBox(
+                                height: 100,
+                                width: 20,
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
+                        icon: const Icon(Icons.delete),
                       ),
-                    ],
-                  )),
-            ],
-          ),
+                      leading: CircleAvatar(
+                        child: Text(snapshot.data![index].id.toString()),
+                      ),
+                    ),
+                  );
+                },
+              );
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            } else {
+              return Center(child: const CircularProgressIndicator());
+            }
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: null,
-        label: Text("Login"),
+        label: const Text("Login"),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
