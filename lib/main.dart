@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:test_app/models/album_model.dart';
+import 'package:test_app/models/product_model.dart';
 
 import 'package:http/http.dart' as http;
 // import 'package:lottie/lottie.dart';
@@ -39,111 +39,192 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // Future<List<Album>> fetchAlbum() async {
-  //   final response = await http
-  //       .get(Uri.parse("https://jsonplaceholder.typicode.com/albums"));
-  //   if (response.statusCode == 200) {
-  //     final List<dynamic> data = json.decode(response.body);
-  //     return data.map((json) => Album.fromJson(json)).toList();
-  //   } else {
-  //     throw Exception("Failed to load album");
-  //   }
-  // }
-
-  // Future<List<Album>> fetchAlbum() async {
-  //   late Future<List<Album>> futureAlbum;
-  //   Uri uriObject = Uri.parse('https://jsonplaceholder.typicode.com/albums');
-
-  //   final response = await get(uriObject);
-  //   if (response.statusCode == 200) {
-  //     List<dynamic> data = jsonDecode(response.body);
-  //     // List<Album> itemsList = List<Album>.from(
-  //   }
-  // }
-
-  Future<List<Album>> fetchAlbums() async {
-    Uri uriObject = Uri.parse('https://jsonplaceholder.typicode.com/albums');
-    final response = await http.get(uriObject);
-
+  Future<List<Products>> fetchProducts() async {
+    final response =
+        await http.get(Uri.parse("https://dummyjson.com/products"));
     if (response.statusCode == 200) {
-      List<dynamic> parseListJson = jsonDecode(response.body);
+      final List<dynamic> data = json.decode(response.body)["products"];
 
-      //cant access by iterable through index
-      List<Album> items = List<Album>.from(
-        //map returns and interable
-        parseListJson.map<Album>((dynamic user) => Album.fromjson(user)),
-      );
-
-      //.from is more optimized than .tolist()
-
-      return items;
+      return data.map((json) => Products.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to load album');
+      throw Exception("Failed to get data");
     }
   }
 
   @override
   void initState() {
     super.initState();
+    print(fetchProducts());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: const Text("Login"),
-        centerTitle: true,
-      ),
-      body: SafeArea(
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: FutureBuilder(
-          future: fetchAlbums(),
+          future: fetchProducts(),
           builder: (context, snapshot) {
+            print(snapshot.data);
             if (snapshot.hasData) {
               return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  return Card(
-                    elevation: 3,
-                    child: ListTile(
-                      style: ListTileStyle.list,
-                      onTap: () {},
-                      title: Text(snapshot.data![index].title),
-                      trailing: IconButton(
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) => Card(
-                              child: SizedBox(
-                                height: 100,
-                                width: 20,
+                  List<Products> productList = snapshot.data!;
+                  return AspectRatio(
+                    aspectRatio: 4 / 3,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Card(
+                        clipBehavior: Clip.antiAlias,
+                        elevation: 10,
+                        child: Column(
+                          children: [
+                            AspectRatio(
+                                aspectRatio: 4 / 1.5,
+                                child: Image.network(
+                                  productList[index].thumbnail!,
+                                  fit: BoxFit.cover,
+                                )),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 10,
+                                right: 10,
+                                top: 20,
+                                bottom: 8,
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(productList[index].title,
+                                          style: const TextStyle(
+                                              overflow: TextOverflow.ellipsis,
+                                              fontWeight: FontWeight.bold)),
+                                      const SizedBox(
+                                        height: 40,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${productList[index].price} USD",
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          IconButton(
+                                            onPressed: () {
+                                              showBottomSheet(
+                                                  elevation: 20,
+                                                  context: context,
+                                                  builder: (context) {
+                                                    Products prod =
+                                                        productList[index];
+                                                    return Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        AspectRatio(
+                                                          aspectRatio: 4 / 2,
+                                                          child:
+                                                              ListView.builder(
+                                                                  scrollDirection:
+                                                                      Axis
+                                                                          .horizontal,
+                                                                  shrinkWrap:
+                                                                      true,
+                                                                  itemCount: prod
+                                                                      .images
+                                                                      .length,
+                                                                  itemBuilder:
+                                                                      (context,
+                                                                          index) {
+                                                                    return Padding(
+                                                                      padding: const EdgeInsets
+                                                                              .symmetric(
+                                                                          horizontal:
+                                                                              8),
+                                                                      child: Image
+                                                                          .network(
+                                                                              prod.images[index]),
+                                                                    );
+                                                                  }),
+                                                        ),
+                                                        Column(
+                                                          children: [
+                                                            Text(prod.title),
+                                                            Text(prod
+                                                                .description!),
+                                                            Text(
+                                                                "\$ ${prod.price}"),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    Icon(Icons
+                                                                        .star)
+                                                                  ],
+                                                                ),
+                                                                Row(
+                                                                  children: [
+                                                                    Text(
+                                                                        "${prod.discountPercentage} %"),
+                                                                    Icon(
+                                                                      Icons
+                                                                          .discount,
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    );
+                                                  });
+                                            },
+                                            icon: const Icon(
+                                                Icons.remove_red_eye_sharp),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      productList[index].description!,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
-                          );
-                        },
-                        icon: const Icon(Icons.delete),
-                      ),
-                      leading: CircleAvatar(
-                        child: Text(snapshot.data![index].id.toString()),
+                          ],
+                        ),
                       ),
                     ),
                   );
                 },
               );
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
             } else {
-              return Center(child: const CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
             }
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: null,
-        label: const Text("Login"),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: const Text("Login"),
+        centerTitle: true,
       ),
     );
   }
