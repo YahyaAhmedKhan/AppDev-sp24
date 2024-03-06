@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:http/http.dart';
-import 'package:test_app/models/model.dart';
-
 import 'package:http/http.dart' as http;
+import 'models/launch_model.dart';
 
 // import 'home_page.dart';
 // import 'package:lottie/lottie.dart';
@@ -22,9 +23,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 126, 162, 245)),
-        useMaterial3: true,
+        // colorScheme: ColorScheme.fromSeed(
+        //     seedColor: const Color.fromARGB(255, 126, 162, 245)),
+        useMaterial3: false,
       ),
       home: const HomePage(),
     );
@@ -39,21 +40,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
-    }
-    return int.parse(hexColor, radix: 16);
-  }
-
-  Future<List<APIDataModel>> fetchProducts() async {
-    final response = await http.get(Uri.parse(
-        "https://makeup-api.herokuapp.com/api/v1/products.json?brand=maybelline"));
+  Future<List<Launch>> fetchLaunches() async {
+    final response =
+        await http.get(Uri.parse("https://api.spacexdata.com/v3/missions"));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      List<APIDataModel> productList =
-          data.map((e) => APIDataModel.fromJson(e)).toList();
+      List<Launch> productList = data.map((e) => Launch.fromJson(e)).toList();
       return productList;
     } else {
       throw Exception("failed to get data");
@@ -64,117 +56,149 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
         title: const Text(
-          "Products",
+          "Space Missions",
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.blue,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          color: Colors.white,
-          onPressed: () {},
-        ),
+        backgroundColor: const Color(0xFF016B6D),
       ),
       body: FutureBuilder(
-        future: fetchProducts(),
+        future: fetchLaunches(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final List<APIDataModel> products = snapshot.data!;
-
-            // print(snapshot.data);
+            List<Launch> launchList = snapshot.data!;
+            // print(launchList);
             return ListView.builder(
+              itemCount: launchList.length,
               itemBuilder: (context, index) {
-                APIDataModel prod = products[index];
-                return Card(
-                  color: Colors.white,
-                  child: InkWell(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Column(
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                        height: 80,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20.0),
-                                          child: Image.network(prod.imageLink!),
-                                        )),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          top: 20,
-                                          left: 10,
-                                          right: 10,
-                                        ),
-                                        child: Text(
-                                          prod.description!,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 4, vertical: 6),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: SizedBox(
-                              child: Image.network(prod.imageLink!),
-                              height: 50,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 8,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: SizedBox(
-                                  height: 50,
-                                  child: Text(
-                                    prod.name!,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Center(child: Text("\$ ${prod.price!}")),
-                          ),
-                        ],
-                      ),
-                    ),
+                Launch launch = launchList[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 10,
                   ),
+                  child: launchCard(launch: launch),
                 );
               },
             );
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
         },
+      ),
+    );
+  }
+}
+
+class launchCard extends StatefulWidget {
+  const launchCard({
+    super.key,
+    required this.launch,
+  });
+
+  final Launch launch;
+
+  @override
+  State<launchCard> createState() => _launchCardState();
+}
+
+class _launchCardState extends State<launchCard> {
+  bool showFull = false;
+
+  void _toggleFull() {
+    setState(() {
+      showFull = !showFull;
+      print("$showFull  ${widget.launch.missionName}");
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 10,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.launch.missionName!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            Text(widget.launch.description!,
+                maxLines: showFull ? null : 1,
+                overflow: showFull ? null : TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 15,
+                )),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                    ),
+                  ),
+                  backgroundColor:
+                      MaterialStatePropertyAll<Color>(Color(0xFFdcdcdc)),
+                ),
+                onPressed: () {
+                  _toggleFull();
+                },
+                child: showFull
+                    ? const Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text(
+                          "Less",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_upward,
+                          color: Colors.blue,
+                        )
+                      ])
+                    : const Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text("More",
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                            )),
+                        Icon(
+                          Icons.arrow_downward,
+                          color: Colors.blue,
+                        )
+                      ]),
+              ),
+            ),
+            Center(
+              child: Wrap(
+                children: widget.launch.payloadIds!
+                    .map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Chip(
+                          label: Text(e),
+                          backgroundColor: Colors.primaries[
+                              Random().nextInt(Colors.primaries.length)],
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
