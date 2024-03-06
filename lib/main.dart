@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       List<Launch> productList = data.map((e) => Launch.fromJson(e)).toList();
       return productList;
     } else {
-      throw Exception("failed to get data");
+      throw Exception("Failed to get data");
     }
   }
 
@@ -67,20 +67,7 @@ class _HomePageState extends State<HomePage> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List<Launch> launchList = snapshot.data!;
-            // print(launchList);
-            return ListView.builder(
-              itemCount: launchList.length,
-              itemBuilder: (context, index) {
-                Launch launch = launchList[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 10,
-                  ),
-                  child: launchCard(launch: launch),
-                );
-              },
-            );
+            return _launchCardList(launchList);
           } else {
             return const Center(
               child: CircularProgressIndicator(),
@@ -88,6 +75,22 @@ class _HomePageState extends State<HomePage> {
           }
         },
       ),
+    );
+  }
+
+  ListView _launchCardList(List<Launch> launchList) {
+    return ListView.builder(
+      itemCount: launchList.length,
+      itemBuilder: (context, index) {
+        Launch launch = launchList[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 6,
+            vertical: 10,
+          ),
+          child: launchCard(launch: launch),
+        );
+      },
     );
   }
 }
@@ -117,6 +120,9 @@ class _launchCardState extends State<launchCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+      ),
       elevation: 10,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -129,16 +135,20 @@ class _launchCardState extends State<launchCard> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                fontSize: 24,
               ),
             ),
-            Text(widget.launch.description!,
-                maxLines: showFull ? null : 1,
-                overflow: showFull ? null : TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 15,
-                )),
+            Padding(
+              padding: const EdgeInsets.only(top: 5, bottom: 5),
+              child: Text(widget.launch.description!,
+                  maxLines: showFull ? null : 1,
+                  overflow: showFull ? null : TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 15,
+                  )),
+            ),
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
@@ -149,7 +159,7 @@ class _launchCardState extends State<launchCard> {
                     ),
                   ),
                   backgroundColor:
-                      MaterialStatePropertyAll<Color>(Color(0xFFdcdcdc)),
+                      const MaterialStatePropertyAll<Color>(Color(0xFFdcdcdc)),
                 ),
                 onPressed: () {
                   _toggleFull();
