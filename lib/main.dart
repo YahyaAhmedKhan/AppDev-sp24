@@ -23,8 +23,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        // colorScheme: ColorScheme.fromSeed(
-        //     seedColor: const Color.fromARGB(255, 126, 162, 245)),
         useMaterial3: false,
       ),
       home: const HomePage(),
@@ -55,13 +53,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Space Missions",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF016B6D),
-      ),
+      appBar: spaceMissAppBar(),
       body: FutureBuilder(
         future: fetchLaunches(),
         builder: (context, snapshot) {
@@ -69,12 +61,26 @@ class _HomePageState extends State<HomePage> {
             List<Launch> launchList = snapshot.data!;
             return _launchCardList(launchList);
           } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return loadingButton();
           }
         },
       ),
+    );
+  }
+
+  AppBar spaceMissAppBar() {
+    return AppBar(
+      title: const Text(
+        "Space Missions",
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: const Color(0xFF016B6D),
+    );
+  }
+
+  Center loadingButton() {
+    return const Center(
+      child: CircularProgressIndicator(),
     );
   }
 
@@ -130,86 +136,102 @@ class _launchCardState extends State<launchCard> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.launch.missionName!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 24,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 5, bottom: 5),
-              child: Text(widget.launch.description!,
-                  maxLines: showFull ? null : 1,
-                  overflow: showFull ? null : TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 15,
-                  )),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                    ),
-                  ),
-                  backgroundColor:
-                      const MaterialStatePropertyAll<Color>(Color(0xFFdcdcdc)),
-                ),
-                onPressed: () {
-                  _toggleFull();
-                },
-                child: showFull
-                    ? const Row(mainAxisSize: MainAxisSize.min, children: [
-                        Text(
-                          "Less",
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Icon(
-                          Icons.arrow_upward,
-                          color: Colors.blue,
-                        )
-                      ])
-                    : const Row(mainAxisSize: MainAxisSize.min, children: [
-                        Text("More",
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                            )),
-                        Icon(
-                          Icons.arrow_downward,
-                          color: Colors.blue,
-                        )
-                      ]),
-              ),
-            ),
+            launchCardName(),
+            launchCardDesc(),
+            launchCardShowButton(),
             Center(
-              child: Wrap(
-                children: widget.launch.payloadIds!
-                    .map(
-                      (e) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Chip(
-                          label: Text(e),
-                          backgroundColor: Colors.primaries[
-                              Random().nextInt(Colors.primaries.length)],
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
+              child: payLoadChipList(),
             )
           ],
         ),
       ),
+    );
+  }
+
+  Align launchCardShowButton() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: ElevatedButton(
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            ),
+          ),
+          backgroundColor:
+              const MaterialStatePropertyAll<Color>(Color(0xFFdcdcdc)),
+        ),
+        onPressed: () {
+          _toggleFull();
+        },
+        child: showFull
+            ? const Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(
+                  "Less",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_upward,
+                  color: Colors.blue,
+                )
+              ])
+            : const Row(mainAxisSize: MainAxisSize.min, children: [
+                Text("More",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    )),
+                Icon(
+                  Icons.arrow_downward,
+                  color: Colors.blue,
+                )
+              ]),
+      ),
+    );
+  }
+
+  Padding launchCardDesc() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 5, bottom: 5),
+      child: Text(widget.launch.description!,
+          maxLines: showFull ? null : 1,
+          overflow: showFull ? null : TextOverflow.ellipsis,
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 15,
+          )),
+    );
+  }
+
+  Text launchCardName() {
+    return Text(
+      widget.launch.missionName!,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 24,
+      ),
+    );
+  }
+
+  Wrap payLoadChipList() {
+    return Wrap(
+      children: widget.launch.payloadIds!
+          .map(
+            (e) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Chip(
+                label: Text(e),
+                backgroundColor:
+                    Colors.primaries[Random().nextInt(Colors.primaries.length)],
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }
