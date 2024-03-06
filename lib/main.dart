@@ -52,6 +52,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // didnt wrap this with SafeArea because notification
+    // bar looked black.
     return Scaffold(
       appBar: spaceMissAppBar(),
       body: FutureBuilder(
@@ -222,16 +224,20 @@ class _launchCardState extends State<launchCard> {
     return Wrap(
       children: widget.launch.payloadIds!
           .map(
-            (e) => Padding(
+            (payload) => Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Chip(
-                label: Text(e),
-                backgroundColor:
-                    Colors.primaries[Random().nextInt(Colors.primaries.length)],
-              ),
+              child: payloadChip(payload),
             ),
           )
           .toList(),
+    );
+  }
+
+  Chip payloadChip(String e) {
+    return Chip(
+      label: Text(e),
+      backgroundColor:
+          Colors.primaries[Random().nextInt(Colors.primaries.length)],
     );
   }
 }
